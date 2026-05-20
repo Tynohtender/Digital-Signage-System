@@ -57,15 +57,17 @@ The system allows companies to remotely manage their digital displays through AP
 ## 📸 Screenshots
 
 ### 🖥 Main Display Screen
-
-<img width="1366" height="768" alt="Screenshot from 2026-05-20 09-21-18" src="https://github.com/user-attachments/assets/556bcffb-8d8c-48e4-83e4-52b26f753ab7" />
-
+<img width="1366" height="768" alt="Screenshot from 2026-05-20 11-45-11" src="https://github.com/user-attachments/assets/bb15075f-7471-470b-beea-f0bfe4a7d7cd" />
 
 ### ⚙️ Admin Dashboard
-<img width="1366" height="768" alt="Screenshot from 2026-05-20 09-19-51" src="https://github.com/user-attachments/assets/6e80b5e1-2c5d-474d-ad01-a44ec82607cc" />
+<img width="1366" height="768" alt="Screenshot from 2026-05-20 11-42-59" src="https://github.com/user-attachments/assets/112b20a6-dcd3-4cce-8ee4-f20be2797f5c" />
 
-### 📱 Responsive Layout
-<img width="1366" height="768" alt="Screenshot from 2026-05-20 09-20-51" src="https://github.com/user-attachments/assets/10b4e1fc-7442-4a70-a02d-71752aa5c47b" />
+### 📱 Client Dashboard
+<img width="1366" height="768" alt="Screenshot from 2026-05-20 11-38-36" src="https://github.com/user-attachments/assets/0d6ecf8d-862c-4616-844e-ee71afd78045" />
+
+### 📱 Client Menu
+<img width="1366" height="768" alt="Screenshot from 2026-05-20 11-45-54" src="https://github.com/user-attachments/assets/c418eba0-72a6-4cf4-ba3e-a19e8f4fbacb" />
+
 
 
 ## ✨ Use Cases
