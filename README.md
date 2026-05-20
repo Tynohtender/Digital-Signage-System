@@ -1,7 +1,7 @@
 # Digital-Signage-System
 
 ## 📖 Overview
-The Digital Signage System is a scalable platform designed to manage and display dynamic digital menu boards and promotional content for multiple businesses.  
+A full-stack SaaS Digital Menu Board platform using FastAPI, SQLite, HTML, CSS, and JavaScript featuring multi-client management, real-time menu updates, image uploads, glassmorphism UI, authentication, and live animated digital signage displays.
 
 The system allows companies to remotely manage their digital displays through API-driven content updates, making it ideal for restaurants, retail stores, cafes, and commercial advertising screens.
 
@@ -37,22 +37,20 @@ The system allows companies to remotely manage their digital displays through AP
 ## 🛠 Tech Stack
 
 ### Frontend
-- Angular
-- HTML
-- CSS
-- JavaScript
+- HTML5
+- CSS3
+- JavaScript (Vanilla JS)
 
 ### Backend
 - Python
-
+- FastAPI
+- 
 ### Database
 - SQL Database
 
 ### Other Tools
-- REST APIs
-- Git & GitHub
-
-
+- REST API
+- Fech API
 
 ## 📸 Screenshots
 
