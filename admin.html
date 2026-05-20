@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Admin Dashboard</title>
+
+<style>
+
+/* RESET */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+/* BODY */
+body{
+    min-height:100vh;
+    padding:40px;
+    background:url("https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1974&auto=format&fit=crop") center/cover no-repeat fixed;
+    color:white;
+    position:relative;
+}
+
+/* OVERLAY */
+body::before{
+    content:"";
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.6);
+    backdrop-filter:blur(3px);
+    z-index:-1;
+}
+
+/* TITLE */
+h2{
+    text-align:center;
+    font-size:42px;
+    margin-bottom:35px;
+    letter-spacing:2px;
+}
+
+/* TOP PANEL */
+.top-panel{
+    max-width:1000px;
+    margin:auto;
+
+    padding:25px;
+
+    display:flex;
+    flex-wrap:wrap;
+    gap:15px;
+    justify-content:center;
+
+    border-radius:30px;
+
+    background:rgba(255,255,255,0.08);
+
+    backdrop-filter:blur(20px);
+
+    border:1px solid rgba(255,255,255,0.1);
+
+    box-shadow:
+        0 8px 32px rgba(0,0,0,0.4),
+        inset 0 0 15px rgba(255,255,255,0.05);
+}
+
+/* INPUTS */
+.top-panel input{
+    padding:15px 18px;
+
+    border:none;
+    outline:none;
+
+    border-radius:18px;
+
+    min-width:250px;
+
+    background:rgba(255,255,255,0.08);
+
+    color:white;
+    font-size:15px;
+
+    backdrop-filter:blur(12px);
+
+    box-shadow:
+        inset 0 0 10px rgba(255,255,255,0.08),
+        0 4px 20px rgba(0,0,0,0.2);
+}
+
+.top-panel input::placeholder{
+    color:#ddd;
+}
+
+/* BUTTONS */
+button{
+    border:none;
+    cursor:pointer;
+
+    padding:14px 24px;
+
+    border-radius:18px;
+
+    color:white;
+    font-weight:bold;
+    font-size:15px;
+
+    transition:0.3s;
+
+    background:linear-gradient(90deg,#7b2ff7,#f107a3);
+
+    box-shadow:0 5px 20px rgba(241,7,163,0.4);
+}
+
+button:hover{
+    transform:translateY(-2px) scale(1.03);
+}
+
+/* CLIENT GRID */
+#clients{
+    margin-top:40px;
+
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+    gap:25px;
+}
+
+/* CLIENT CARD */
+.client-card{
+
+    padding:25px;
+
+    border-radius:25px;
+
+    background:rgba(255,255,255,0.08);
+
+    backdrop-filter:blur(18px);
+
+    border:1px solid rgba(255,255,255,0.1);
+
+    box-shadow:
+        0 8px 32px rgba(0,0,0,0.35),
+        inset 0 0 12px rgba(255,255,255,0.04);
+
+    transition:0.3s;
+}
+
+.client-card:hover{
+    transform:translateY(-5px);
+}
+
+/* TEXT */
+.client-card h3{
+    font-size:24px;
+    margin-bottom:15px;
+}
+
+.client-card p{
+    color:#ddd;
+    margin-bottom:8px;
+    word-break:break-word;
+}
+
+/* BUTTON AREA */
+.actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:18px;
+}
+
+/* SPECIAL BUTTONS */
+.live-btn{
+    background:linear-gradient(90deg,#ffb347,#ffcc33);
+    color:black;
+}
+
+.delete-btn{
+    background:linear-gradient(90deg,#ff0844,#ff4b2b);
+}
+
+/* MOBILE */
+@media(max-width:700px){
+
+    body{
+        padding:20px;
+    }
+
+    h2{
+        font-size:30px;
+    }
+
+    .top-panel{
+        flex-direction:column;
+    }
+
+    .top-panel input{
+        width:100%;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<h2>Admin Dashboard</h2>
+
+<div class="top-panel">
+
+    <input
+        id="business"
+        placeholder="Business Name"
+    >
+
+    <input
+        id="email"
+        placeholder="Client Email"
+    >
+
+    <button onclick="createClientUser()">
+        Create Client + User
+    </button>
+
+</div>
+
+<div id="clients"></div>
+
+<script>
+
+/* =========================
+   CREATE CLIENT
+========================= */
+function createClientUser(){
+
+fetch("http://127.0.0.1:8000/admin/create-client-user/", {
+
+    method:"POST",
+
+    headers:{
+        "Content-Type":"application/json"
+    },
+
+    body:JSON.stringify({
+        business_name:document.getElementById("business").value,
+        email:document.getElementById("email").value
+    })
+
+})
+
+.then(res => res.json())
+
+.then(data => {
+
+    console.log(data);
+
+    if(data.email){
+
+        alert(`
+CLIENT CREATED SUCCESSFULLY
+
+Email:
+${data.email}
+
+Password:
+${data.password}
+
+Client ID:
+${data.client_id}
+
+LIVE MENU:
+display.html?slug=${data.slug}
+        `);
+
+        document.getElementById("business").value = "";
+        document.getElementById("email").value = "";
+
+        loadClients();
+
+    }else{
+
+        alert(data.error || "Error creating client");
+
+    }
+
+})
+
+.catch(err => {
+
+    console.error(err);
+
+    alert("Server Error");
+
+});
+
+}
+
+/* =========================
+   LOAD CLIENTS
+========================= */
+function loadClients(){
+
+fetch("http://127.0.0.1:8000/clients/")
+
+.then(res => res.json())
+
+.then(data => {
+
+    let html = "";
+
+    data.forEach(client => {
+
+        html += `
+
+        <div class="client-card">
+
+            <h3>${client.business_name}</h3>
+
+            <p><b>Client ID:</b> ${client.id}</p>
+
+            <p><b>Slug:</b> ${client.slug}</p>
+
+            <div class="actions">
+
+                <button onclick="openClient(${client.id})">
+                    Manage
+                </button>
+
+                <button
+                    class="live-btn"
+                    onclick="openLiveMenu('${client.slug}')"
+                >
+                    Live Menu
+                </button>
+
+                <button
+                    class="delete-btn"
+                    onclick="deleteClient(${client.id})"
+                >
+                    Delete
+                </button>
+
+            </div>
+
+        </div>
+
+        `;
+    });
+
+    document.getElementById("clients").innerHTML = html;
+
+})
+
+.catch(err => {
+    console.error(err);
+});
+
+}
+
+/* =========================
+   DELETE CLIENT
+========================= */
+function deleteClient(id){
+
+if(!confirm("Delete this client?")) return;
+
+fetch(`http://127.0.0.1:8000/delete-client/${id}`, {
+
+    method:"DELETE"
+
+})
+
+.then(() => {
+    loadClients();
+});
+
+}
+
+/* =========================
+   OPEN CLIENT MENU DASHBOARD
+========================= */
+function openClient(id){
+
+localStorage.setItem("client_id", id);
+
+window.location.href = "menu.html";
+
+}
+
+/* =========================
+   OPEN LIVE DISPLAY
+========================= */
+function openLiveMenu(slug){
+
+window.open(
+    `display.html?slug=${slug}`,
+    "_blank"
+);
+
+}
+
+/* =========================
+   START
+========================= */
+loadClients();
+
+</script>
+
+</body>
+</html>
