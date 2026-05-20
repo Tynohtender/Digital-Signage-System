@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Live Digital Menu</title>
+
+<style>
+
+/* =========================
+   BODY
+========================= */
+body{
+    margin:0;
+    padding:0;
+    font-family:Arial, sans-serif;
+    color:white;
+    overflow:hidden;
+
+    background:
+    linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.7)),
+    url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1600&auto=format&fit=crop");
+    
+    background-size:cover;
+    background-position:center;
+    background-attachment:fixed;
+}
+
+/* =========================
+   HEADER
+========================= */
+.header{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    z-index:1000;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:20px 40px;
+
+    backdrop-filter: blur(20px);
+    background: rgba(255,255,255,0.08);
+
+    border-bottom:1px solid rgba(255,255,255,0.15);
+
+    box-sizing:border-box;
+}
+
+.brand h1{
+    margin:0;
+    font-size:32px;
+    font-weight:bold;
+
+    background:linear-gradient(45deg,#ff00cc,#7d2cff,#00d4ff);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+
+    letter-spacing:2px;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+.controls{
+    display:flex;
+    gap:15px;
+}
+
+.controls button{
+    border:none;
+    padding:12px 24px;
+    border-radius:30px;
+
+    background:rgba(255,255,255,0.12);
+    color:white;
+
+    backdrop-filter: blur(20px);
+
+    border:1px solid rgba(255,255,255,0.2);
+
+    cursor:pointer;
+
+    transition:0.3s;
+    font-weight:bold;
+}
+
+.controls button:hover{
+    transform:translateY(-3px) scale(1.05);
+
+    background:linear-gradient(45deg,#ff00cc,#7d2cff);
+
+    box-shadow:0 0 20px rgba(255,0,204,0.4);
+}
+
+/* =========================
+   MENU GRID
+========================= */
+.grid{
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+
+    gap:30px;
+
+    padding:120px 40px 40px;
+
+    height:100vh;
+
+    overflow-y:auto;
+
+    box-sizing:border-box;
+}
+
+/* =========================
+   GLASS CARD
+========================= */
+.flip-card{
+    perspective:1000px;
+}
+
+.flip-inner{
+    position:relative;
+
+    width:100%;
+    height:340px;
+
+    transform-style:preserve-3d;
+
+    transition:transform 1s;
+}
+
+/* FRONT + BACK */
+.flip-front,
+.flip-back{
+    position:absolute;
+
+    width:100%;
+    height:100%;
+
+    border-radius:25px;
+
+    overflow:hidden;
+
+    background:rgba(255,255,255,0.08);
+
+    backdrop-filter: blur(20px);
+
+    border:1px solid rgba(255,255,255,0.15);
+
+    box-shadow:
+    0 8px 32px rgba(0,0,0,0.3);
+
+    backface-visibility:hidden;
+
+    display:flex;
+    flex-direction:column;
+
+    transition:0.3s;
+}
+
+.flip-back{
+    transform:rotateY(180deg);
+}
+
+/* =========================
+   IMAGE
+========================= */
+.flip-front img,
+.flip-back img{
+    width:100%;
+    height:220px;
+    object-fit:cover;
+}
+
+/* =========================
+   CONTENT
+========================= */
+.content{
+    padding:18px;
+}
+
+.content h3{
+    margin:0 0 10px;
+    font-size:24px;
+}
+
+.price{
+    font-size:20px;
+    font-weight:bold;
+
+    color:#00ffd5;
+}
+
+/* =========================
+   FLIP EFFECT
+========================= */
+.flipped{
+    transform:rotateY(180deg);
+}
+
+/* =========================
+   SCROLLBAR
+========================= */
+.grid::-webkit-scrollbar{
+    width:8px;
+}
+
+.grid::-webkit-scrollbar-thumb{
+    background:#ff00cc;
+    border-radius:10px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media(max-width:700px){
+
+    .header{
+        flex-direction:column;
+        gap:15px;
+    }
+
+    .brand h1{
+        font-size:24px;
+    }
+
+    .controls button{
+        padding:10px 18px;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- =========================
+     HEADER
+========================= -->
+<div class="header">
+
+    <div class="brand">
+        <h1 id="title">LIVE MENU</h1>
+    </div>
+
+    <div class="controls">
+        <button onclick="setMode('static')">
+            Static
+        </button>
+
+        <button onclick="setMode('flip')">
+            Flip
+        </button>
+    </div>
+
+</div>
+
+<!-- =========================
+     MENU GRID
+========================= -->
+<div id="menu" class="grid"></div>
+
+<script>
+
+/* =========================
+   GET SLUG
+========================= */
+const params = new URLSearchParams(window.location.search);
+const slug = params.get("slug");
+
+/* =========================
+   GET CLIENT NAME
+========================= */
+fetch(`http://127.0.0.1:8000/client-by-slug/${slug}`)
+.then(res => res.json())
+.then(data => {
+
+    document.getElementById("title").innerText =
+        data.business_name || "LIVE MENU";
+
+});
+
+/* =========================
+   STATE
+========================= */
+let menuData = [];
+let page = 0;
+
+let mode =
+localStorage.getItem("mode") || "flip";
+
+const itemsPerPage = 8;
+
+/* =========================
+   CHANGE MODE
+========================= */
+function setMode(m){
+
+    mode = m;
+
+    localStorage.setItem("mode", m);
+
+    renderPage();
+
+}
+
+/* =========================
+   FETCH MENU
+========================= */
+async function fetchMenu(){
+
+    try{
+
+        let res = await fetch(
+            `http://127.0.0.1:8000/menu-by-slug/${slug}`
+        );
+
+        let data = await res.json();
+
+        menuData = data;
+
+        renderPage();
+
+    }catch(err){
+
+        console.error(err);
+
+    }
+
+}
+
+/* =========================
+   RENDER
+========================= */
+function renderPage(){
+
+    const container =
+    document.getElementById("menu");
+
+    container.innerHTML = "";
+
+    if(menuData.length === 0){
+
+        container.innerHTML =
+        "<h2>No Menu Items</h2>";
+
+        return;
+    }
+
+    const totalPages =
+    Math.ceil(menuData.length / itemsPerPage);
+
+    if(page >= totalPages){
+        page = 0;
+    }
+
+    let start =
+    page * itemsPerPage;
+
+    let currentItems =
+    menuData.slice(start, start + itemsPerPage);
+
+    /* DUPLICATE IF BELOW 8 */
+    if(currentItems.length < itemsPerPage){
+
+        currentItems = currentItems.concat(
+            menuData.slice(
+                0,
+                itemsPerPage - currentItems.length
+            )
+        );
+
+    }
+
+    let html = "";
+
+    currentItems.forEach(item => {
+
+        let img =
+        item.image.startsWith("http")
+        ? item.image
+        : `http://127.0.0.1:8000${item.image}`;
+
+        html += `
+
+        <div class="flip-card">
+
+            <div class="flip-inner">
+
+                <!-- FRONT -->
+                <div class="flip-front">
+
+                    <img
+                        src="${img}"
+
+                        onerror="
+                        this.src='https://via.placeholder.com/400x300'
+                        "
+                    >
+
+                    <div class="content">
+                        <h3>${item.title}</h3>
+
+                        <p class="price">
+                            ${item.price}
+                        </p>
+                    </div>
+
+                </div>
+
+                <!-- BACK -->
+                <div class="flip-back">
+
+                    <img src="${img}">
+
+                    <div class="content">
+                        <h3>${item.title}</h3>
+
+                        <p class="price">
+                            ${item.price}
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+    container.innerHTML = html;
+
+    if(mode === "flip"){
+        triggerFlip();
+    }
+
+    page++;
+
+}
+
+/* =========================
+   FLIP ANIMATION
+========================= */
+function triggerFlip(){
+
+    const cards =
+    document.querySelectorAll(".flip-inner");
+
+    cards.forEach((card, i) => {
+
+        setTimeout(() => {
+
+            card.classList.add("flipped");
+
+        }, i * 150);
+
+        setTimeout(() => {
+
+            card.classList.remove("flipped");
+
+        }, 2600 + (i * 150));
+
+    });
+
+}
+
+/* =========================
+   AUTO REFRESH
+========================= */
+setInterval(async () => {
+
+    await fetchMenu();
+
+}, 5000);
+
+/* =========================
+   START
+========================= */
+fetchMenu();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Digital Menu Boards</title>
+
+<style>
+
+/* RESET */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+/* BODY */
+body{
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden;
+    background:url("https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1974&auto=format&fit=crop") center/cover no-repeat;
+    position:relative;
+}
+
+/* DARK OVERLAY */
+body::before{
+    content:"";
+    position:absolute;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.45);
+    backdrop-filter:blur(2px);
+}
+
+/* LOGIN CARD */
+.login-container{
+    position:relative;
+    z-index:2;
+
+    width:380px;
+    padding:40px 30px;
+
+    border-radius:30px;
+
+    background:rgba(255,255,255,0.08);
+
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+
+    border:1px solid rgba(255,255,255,0.15);
+
+    box-shadow:
+        0 8px 32px rgba(0,0,0,0.4),
+        inset 0 0 20px rgba(255,255,255,0.05);
+}
+
+/* LOGO */
+.logo{
+    text-align:center;
+    margin-bottom:25px;
+}
+
+.logo h1{
+    color:white;
+    font-size:32px;
+    letter-spacing:1px;
+}
+
+.logo p{
+    color:#ddd;
+    margin-top:5px;
+    font-size:14px;
+}
+
+/* INPUT GROUP */
+.input-group{
+    margin-bottom:20px;
+}
+
+.input-group label{
+    color:white;
+    display:block;
+    margin-bottom:8px;
+    font-size:14px;
+}
+
+/* GLASS INPUT */
+.input-group input{
+    width:100%;
+    padding:16px 18px;
+
+    border:none;
+    outline:none;
+
+    border-radius:18px;
+
+    background:rgba(255,255,255,0.08);
+
+    color:white;
+    font-size:16px;
+
+    backdrop-filter:blur(12px);
+
+    box-shadow:
+        inset 0 0 10px rgba(255,255,255,0.08),
+        0 4px 20px rgba(0,0,0,0.2);
+
+    transition:0.3s;
+}
+
+.input-group input::placeholder{
+    color:#ddd;
+}
+
+.input-group input:focus{
+    transform:scale(1.02);
+    border:1px solid rgba(255,255,255,0.3);
+}
+
+/* BUTTON */
+.login-btn{
+    width:100%;
+    padding:16px;
+
+    border:none;
+    border-radius:20px;
+
+    background:linear-gradient(90deg,#7b2ff7,#f107a3);
+
+    color:white;
+    font-size:18px;
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:0.3s;
+
+    box-shadow:0 5px 20px rgba(241,7,163,0.4);
+}
+
+.login-btn:hover{
+    transform:translateY(-2px) scale(1.02);
+}
+
+/* FOOTER */
+.footer{
+    text-align:center;
+    margin-top:20px;
+    color:#ddd;
+    font-size:13px;
+}
+
+/* MOBILE */
+@media(max-width:500px){
+
+    .login-container{
+        width:90%;
+        padding:30px 20px;
+    }
+
+    .logo h1{
+        font-size:26px;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="login-container">
+
+    <div class="logo">
+        <h1>Digital Menu Boards</h1>
+        <p>Modern Restaurant Display System</p>
+    </div>
+
+    <div class="input-group">
+        <label>Email</label>
+        <input
+            id="email"
+            type="email"
+            placeholder="Enter your email"
+        >
+    </div>
+
+    <div class="input-group">
+        <label>Password</label>
+        <input
+            id="password"
+            type="password"
+            placeholder="Enter your password"
+        >
+    </div>
+
+    <button class="login-btn" onclick="login()">
+        Login
+    </button>
+
+    <div class="footer">
+        Powered by Morgan Digital Solutions
+    </div>
+
+</div>
+
+<script>
+
+function login(){
+
+fetch("http://127.0.0.1:8000/login/", {
+method: "POST",
+headers: {"Content-Type": "application/json"},
+body: JSON.stringify({
+    email: document.getElementById("email").value,
+    password: document.getElementById("password").value
+})
+})
+.then(res => res.json())
+.then(data => {
+
+    console.log(data);
+
+    if(data.role === "admin"){
+        window.location.href = "admin.html";
+    }
+    else if(data.client_id){
+
+        localStorage.setItem("client_id", data.client_id);
+
+        window.location.href = "menu.html";
+    }
+    else{
+        alert("Login failed");
+    }
+
+})
+.catch(err => {
+    console.error(err);
+    alert("Server error");
+});
+
+}
+
+</script>
+
+</body>
+</html>
